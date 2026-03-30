@@ -1,3 +1,116 @@
+# 📌 Backend Developer Test
+
+## 🎯 Objective
+ทดสอบความสามารถในการออกแบบและพัฒนา Backend System แบบ Production-ready  
+ครอบคลุม:
+
+- RESTful API Design
+- Authentication (JWT)
+- WebSocket (Realtime)
+- External API Integration (Binance)
+- Caching (Redis)
+- Database Design
+- System Architecture (Monolith vs Microservices)
+
+---
+
+# 🧱 Scope งาน
+
+## 1. User Management API (Core System)
+
+### Requirement
+พัฒนา RESTful API สำหรับจัดการผู้ใช้งาน (CRUD):
+
+- Create User
+- Get User (list + detail)
+- Update User
+- Delete User
+
+### Constraints
+- ต้องมี Authentication (JWT)
+- Endpoint ต้องมี:
+  - Validation input
+  - Error handling ที่เหมาะสม
+
+### Expected Behavior
+- API ใช้งานได้จริง (ไม่ mock)
+- Structure ต้อง scalable
+
+---
+
+## 2. WebSocket (Realtime System)
+
+### Requirement
+เพิ่ม WebSocket support โดย:
+
+- เมื่อมีการ:
+  - Create User
+  - Update User
+- ต้อง broadcast event ไปยัง client แบบ realtime
+
+### Expected Events
+- `user.created`
+- `user.updated`
+
+### Expected Behavior
+- Client connect แล้ว receive event ได้ทันที
+- ไม่มี delay หรือ duplicate event
+- รองรับหลาย client พร้อมกัน
+
+---
+
+## 3. Tech Stack Selection
+
+### Requirement
+เลือกใช้ 1 อย่าง:
+
+- FastAPI (Python)
+- Node.js (Express / Fastify)
+
+### Deliverable
+ใน README ต้องอธิบาย:
+
+- เหตุผลที่เลือก stack นี้
+- เปรียบเทียบกับอีกตัวเลือก (ข้อดี / ข้อเสีย)
+
+---
+
+## 4. Binance Integration (External API + Realtime)
+
+### Requirement
+
+#### REST API
+- ดึงราคาปัจจุบัน เช่น:
+  - BTC/USDT
+
+API:
+- https://api.binance.com
+
+
+#### WebSocket
+- Subscribe realtime ticker:
+  - wss://stream.binance.com:9443
+
+
+### Data Handling
+- ต้องเก็บข้อมูลลง database
+- ต้องมี process สำหรับ update ข้อมูลทุก ๆ 1 นาที (minimum)
+- ต้อง handle reconnect เมื่อ WebSocket หลุด
+
+### Expected Behavior
+- ระบบต้องไม่ crash หาก Binance ล่ม
+- ต้องมี retry / fallback logic
+- แยก logic การดึงข้อมูลออกจาก controller
+
+---
+
+## 5. Aggregated API (สำหรับ Frontend)
+
+### Requirement
+
+สร้าง endpoint:
+  GET /dashboard
+
 
 ### Response ต้องประกอบด้วย:
 - ข้อมูลผู้ใช้งาน
@@ -174,8 +287,7 @@
   - Postman collection
 
 ---
-**
+
 💡 Bonus: หากมีการออกแบบระบบให้รองรับ scaling (เช่น queue, pub/sub, horizontal scaling) จะได้รับการพิจารณาเป็นพิเศษ
-**
 
 🚀 ขอให้โชคดี!
