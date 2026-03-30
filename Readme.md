@@ -1,58 +1,181 @@
-# การทดสอบทักษะผู้พัฒนา Backend
 
-## แนะนำ
-ยินดีต้อนรับสู่การทดสอบทักษะผู้พัฒนา Backend! การทดสอบนี้ถูกออกแบบมาเพื่อประเมินทักษะของคุณในการพัฒนา RESTful API, การเชื่อมต่อ WebSocket, การใช้ FastAPI, Node.js, การจัดการแคชข้อมูล, การออกแบบฐานข้อมูล, และการทำงานร่วมกับ API ภายนอก โปรดทำตามคำแนะนำด้านล่างและส่งงานที่คุณทำเสร็จแล้วตามคำแนะนำ
+### Response ต้องประกอบด้วย:
+- ข้อมูลผู้ใช้งาน
+- ราคาล่าสุดของ crypto (จาก Binance)
 
-## ภาพรวมของงาน
+### Expected Behavior
+- Response ต้องเร็ว (ใช้ cache)
+- Data ต้อง sync และ consistent
 
-### 1. การพัฒนา RESTful API
-**งานที่ต้องทำ:**  
-สร้าง RESTful API สำหรับจัดการข้อมูลผู้ใช้งาน (User Management) ที่รองรับการทำงานแบบ CRUD (Create, Read, Update, Delete) โดย API ต้องมีการตรวจสอบสิทธิ์ (Authentication) ด้วย JWT เพื่อความปลอดภัย
+---
 
-### 2. การเชื่อมต่อ WebSocket
-**งานที่ต้องทำ:**  
-เพิ่มการรองรับ WebSocket ใน API ที่คุณพัฒนาจากงานที่ 1 โดยให้มีการแจ้งเตือนแบบเรียลไทม์ เมื่อมีการสร้างหรือแก้ไขข้อมูลผู้ใช้งาน
+## 6. Redis Caching
 
-### 3. การใช้ FastAPI และ Node.js
-**งานที่ต้องทำ:**  
-เลือกใช้ FastAPI (Python) หรือ Node.js (Express.js) ในการพัฒนา API จากงานที่ 1 พร้อมอธิบายเหตุผลในการเลือกใช้ และเปรียบเทียบกับอีกทางเลือกหนึ่ง
+### Requirement
+ใช้ Redis สำหรับ cache:
 
-### 4. การดึงข้อมูลจาก API ภายนอก
-**งานที่ต้องทำ:**  
-ดึงข้อมูลราคาสกุลเงินดิจิทัลปัจจุบัน (เช่น BTC/USDT) จาก Binance API และจาก websocket (binance ticker สำหรับราคา realtime) และจัดเก็บลงในฐานข้อมูลที่คุณเลือก (SQL หรือ NoSQL) โดยข้อมูลควรถูกอัพเดททุก ๆ นาที
-api: https://api.binance.com
-websocket: wss://stream.binance.com:9443
+- ราคาจาก Binance
+- ข้อมูลที่เรียกบ่อย
 
-### 5. การทำงานร่วมกับ Frontend
-**งานที่ต้องทำ:**  
-สร้าง endpoint ที่ให้ Frontend สามารถเรียกใช้เพื่อดึงข้อมูลผู้ใช้งานพร้อมกับราคาสกุลเงินดิจิทัลล่าสุดที่ดึงจาก Binance
+### Constraints
+- ต้องกำหนด TTL (เช่น 30–60 วินาที)
+- ต้องลดจำนวน request ไปยัง Binance
 
-### 6. การจัดการ Data Caching ด้วย Redis
-**งานที่ต้องทำ:**  
-ใช้ Redis ในการแคชข้อมูลราคาสกุลเงินดิจิทัลที่ดึงจาก Binance API โดยตั้งค่า TTL (Time-to-Live) สำหรับข้อมูลที่แคชเพื่อลดการดึงข้อมูลจาก API หลัก
+### Expected Behavior
+- Cache hit → ไม่เรียก external API
+- Cache miss → fetch + set cache
 
-### 7. การออกแบบฐานข้อมูลและ Microservices
-**งานที่ต้องทำ:**  
-ออกแบบโครงสร้างฐานข้อมูลสำหรับจัดเก็บข้อมูลผู้ใช้งานและข้อมูลการเทรด โดยแสดงการออกแบบทั้งแบบ Microservices และ Monolithic อธิบายข้อดีและข้อเสียของแต่ละแบบ และเลือกแบบที่คุณคิดว่าเหมาะสมที่สุด
+---
 
-### 8. การทำงานร่วมกับ API ภายนอก
-**งานที่ต้องทำ:**  
-สร้าง API ภายในที่เชื่อมต่อกับ Binance API เพื่อดึงข้อมูลราคาสกุลเงินและให้บริการข้อมูลนี้กับ API ภายในอื่น ๆ พร้อมทั้งเพิ่มระบบ Authentication เพื่อรักษาความปลอดภัยของ API ภายในนี้
+## 7. Database Design & Architecture
 
-## เกณฑ์การประเมิน
-- **คุณภาพของโค้ด:** ความชัดเจน การจัดระเบียบ และการปฏิบัติตามหลักการที่ดีที่สุดในการเขียนโค้ด
-- **ความถูกต้อง:** ความถูกต้องและความสมบูรณ์ของการทำงาน
-- **ประสิทธิภาพ:** การพิจารณาด้านประสิทธิภาพ โดยเฉพาะในการดึงข้อมูลและการจัดการแคชข้อมูล
-- **การเขียนเอกสาร:** ความชัดเจนและความครบถ้วนของเอกสารประกอบ
-- **การทดสอบ:** ความครอบคลุมและคุณภาพของการทดสอบที่ให้มา
-- **ความคิดสร้างสรรค์:** แนวทางใหม่ ๆ หรือฟีเจอร์เพิ่มเติมที่ช่วยเพิ่มคุณค่าให้กับโซลูชัน
+### Requirement
 
-## วิธีการส่งงาน
-- **Deployment:** ผู้สมัครต้อง deploy API ที่พัฒนาแล้วไปยังผู้ให้บริการ Cloud (เช่น Heroku, AWS, Vercel) และแนบลิงก์ URL สำหรับการทดสอบการใช้งานจริง
-- **Postman Collection:** สร้างและส่ง Postman collection สำหรับการทดสอบ API พร้อมด้วยตัวอย่าง request และ response เพื่อให้ทีมงานสามารถทดสอบ API ได้ง่ายขึ้น
-- **API Documentation:** อธิบายแต่ละ endpoint ของ API ใน `README.md` หรือใช้ Swagger ในการสร้างเอกสาร API ที่ชัดเจน พร้อมแนบลิงก์ URL ของเอกสาร
-- **การทดสอบ:** ผู้สมัครต้องเขียน unit tests และรวมโค้ดการทดสอบใน repository
+#### Database Design
+ออกแบบ schema สำหรับ:
+- Users
+- Crypto Prices / Market Data
 
-เรารอคอยที่จะเห็นผลงานของคุณ!
-email: nanobotsup@gmail.com
-ขอให้โชคดี!
+#### Architecture Comparison
+อธิบาย:
+
+- Monolithic Architecture
+- Microservices Architecture
+
+### Deliverable
+- อธิบาย:
+  - ข้อดี / ข้อเสีย
+  - Use case ที่เหมาะสม
+- เลือกแบบที่เหมาะกับระบบนี้ พร้อมเหตุผล
+
+---
+
+## 8. Internal API Layer
+
+### Requirement
+สร้าง internal service สำหรับ:
+
+- ดึงข้อมูลจาก Binance
+- ให้ service อื่นเรียกใช้งาน
+
+### Constraints
+- ต้องมี authentication (เช่น API key / JWT)
+- ห้ามให้ controller เรียก Binance โดยตรง
+
+### Expected Behavior
+- ลด coupling กับ external API
+- สามารถ scale แยก service ได้ในอนาคต
+
+---
+
+# 🧪 Non-Functional Requirements
+
+### Performance
+- API response time ต้องเหมาะสม (< 300ms เมื่อ cache hit)
+- รองรับ concurrent requests ได้
+
+### Reliability
+- Handle error จาก external API ได้
+- มี retry / timeout mechanism
+
+### Code Quality
+- Clean code
+- Separation of concerns
+- โครงสร้าง project ชัดเจน
+
+---
+
+# 📦 Deliverables
+
+ผู้สมัครต้องส่ง:
+
+## 1. Source Code
+- Git Repository
+
+## 2. Deployment
+- Deploy บน Cloud (เช่น AWS / Render / Railway)
+- แนบ URL สำหรับทดสอบ
+
+## 3. API Documentation
+- Swagger / OpenAPI หรือ README
+- อธิบายทุก endpoint
+
+## 4. Postman Collection
+- พร้อมตัวอย่าง request / response
+
+## 5. Unit Tests
+- ครอบคลุม business logic สำคัญ
+
+## 6. README ต้องมี:
+- วิธี run project
+- Tech stack ที่ใช้ + เหตุผล
+- Architecture decision
+- ปัญหาที่เจอ + วิธีแก้
+
+---
+
+# ⚖️ Evaluation Criteria
+
+### 🔥 Core System
+- CRUD + Auth ใช้งานได้จริง
+- WebSocket ทำงานถูกต้อง
+
+### 🧠 Code Quality
+- โครงสร้างดี
+- Maintainable
+
+### ⚡ Performance
+- ใช้ cache ถูกต้อง
+- ลด external API call
+
+### 🔐 Security
+- JWT implementation ถูกต้อง
+
+### 🧪 Testing
+- มี test ที่ meaningful
+
+### 📄 Documentation
+- ชัดเจน อ่านแล้วเข้าใจ
+
+### 🎯 Architecture Thinking
+- อธิบาย trade-off ได้
+- เลือก solution มีเหตุผล
+
+---
+
+# 🚫 ข้อห้าม
+
+- ห้าม hardcode data แทน logic
+- ห้ามไม่มี authentication
+- ห้ามเรียก Binance API ทุก request (ต้องมี cache)
+- ห้ามเขียนทุกอย่างในไฟล์เดียว
+
+---
+
+# 🧪 Expected Level
+
+นี่คือ **Mid → Senior Level Test**
+
+เราต้องการดูว่า:
+
+- คุณออกแบบ system ได้จริงไหม
+- คุณเข้าใจ real-world constraint ไหม
+- คุณ optimize performance เป็นไหม
+- คุณเขียน code ที่ scale ได้หรือไม่
+
+---
+
+# 📩 Submission
+
+- ส่งผลงานมาที่: **nanobotsup@gmail.com**
+- แนบ:
+  - Git repo
+  - Deployment URL
+  - Postman collection
+
+---
+**
+💡 Bonus: หากมีการออกแบบระบบให้รองรับ scaling (เช่น queue, pub/sub, horizontal scaling) จะได้รับการพิจารณาเป็นพิเศษ
+**
+
+🚀 ขอให้โชคดี!
